@@ -1,0 +1,84 @@
+{% extends 'base.html'%}
+{% block content %}
+
+<section class="text-gray-400 bg-gray-900 body-font min-h-screen">
+  <div class="container px-5 py-16 mx-auto">
+    <div class="flex flex-col text-center w-full mb-12">
+      <h1 class="sm:text-4xl text-3xl font-bold title-font mb-4 text-white">{{ Category.name }}</h1>
+      <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Tasks assigned to this category</p>
+      
+      <!-- Category Stats -->
+      <div class="flex justify-center mt-6">
+        <div class="inline-flex items-center bg-gray-800 rounded-lg px-6 py-3 text-sm">
+          <span class="mr-2 text-indigo-400">Total Tasks:</span>
+          <span class="font-medium text-white">{{ tasks|length }}</span>
+        </div>
+      </div>
+    </div>
+    
+    {% if tasks %}
+    <div class="lg:w-3/4 w-full mx-auto mb-12">
+      <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <table class="table-auto w-full text-left whitespace-no-wrap">
+          <thead>
+            <tr>
+              <th class="px-6 py-4 title-font tracking-wider font-medium text-white text-sm bg-indigo-600">Task</th>
+              <th class="px-6 py-4 title-font tracking-wider font-medium text-white text-sm bg-indigo-600">Description</th>
+              <th class="px-6 py-4 title-font tracking-wider font-medium text-white text-sm bg-indigo-600 text-center w-24">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700 transition-colors duration-200">
+              <td class="px-6 py-4 font-medium">
+                <a href='{% url "leads:task_detail" task.id %}' class="text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
+                  {{task.title}}
+                </a>
+              </td>
+              <td class="px-6 py-4 text-gray-300">
+                <div class="line-clamp-2">{{task.description|truncatechars:100}}</div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex justify-center space-x-2">
+                  <a href='{% url "leads:task_detail" task.id %}' class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="lg:w-3/4 w-full mx-auto mb-12">
+      <div class="bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="text-lg font-medium text-gray-300">No tasks found in this category</p>
+        <p class="text-gray-400 mt-2">Create a new task to get started</p>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="flex flex-col sm:flex-row justify-between items-center lg:w-3/4 w-full mx-auto px-4">
+      <a href="{% url 'leads:category_list' %}" class="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors duration-200 mb-4 sm:mb-0">
+        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+          <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
+        Back to Categories
+      </a>
+      <div class="flex gap-4">
+        <a href="#" class="text-white bg-indigo-600 hover:bg-indigo-700 border-0 py-2 px-6 focus:outline-none rounded shadow-lg transition-colors duration-200">
+          Add New Task
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

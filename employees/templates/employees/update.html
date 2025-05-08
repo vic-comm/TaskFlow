@@ -1,0 +1,135 @@
+{% extends 'base.html'%}
+{% load tailwind_filters %} 
+{% block content%}
+<section class="text-gray-400 bg-gray-900 body-font overflow-hidden min-h-screen">
+    <div class="container px-5 py-16 mx-auto">
+      <div class="lg:w-4/5 mx-auto flex flex-wrap">
+        <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
+          <!-- Header Section -->
+          <div class="flex items-center mb-6">
+            <div class="bg-indigo-500 text-white px-3 py-1 rounded-md text-sm font-medium mr-3">
+              EMPLOYEE
+            </div>
+            {% if employee %}
+              <span class="bg-green-900 text-green-300 px-3 py-1 rounded-md text-xs font-medium">Active</span>
+            {% endif %}
+          </div>
+          
+          <h1 class="text-white text-3xl title-font font-bold mb-4">
+            {% if employee.user.first_name %}
+              {{employee.user.first_name}} {{employee.user.last_name}}
+            {% else %}
+              {{employee.user.username}}
+            {% endif %}
+          </h1>
+          
+          <!-- Navigation Tabs -->
+          <div class="flex mb-8 border-b border-gray-800">
+            <a href='{% url "employees:employee_detail" employee.id %}' class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1 hover:text-indigo-400 transition-colors duration-200">Profile</a>
+            <a href='{% url "employees:employee_update" employee.id %}' class="flex-grow text-indigo-400 border-b-2 border-indigo-500 py-2 text-lg px-1 font-medium">Edit Details</a>
+            <a href="#" class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1 hover:text-indigo-400 transition-colors duration-200">Tasks</a>
+          </div>
+          
+          <!-- Form Section -->
+          <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-white text-lg font-medium mb-4">Update Employee Information</h3>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ form|crispy }}
+                
+                <div class="flex items-center justify-end mt-8">
+                  <button type="submit" class="text-white bg-indigo-600 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-700 rounded shadow-lg transition-colors duration-200 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Changes
+                  </button>
+                </div>
+            </form>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row justify-between items-center">
+            <a href="{% url 'employees:employee_detail' employee.id %}" class="text-gray-400 inline-flex items-center hover:text-white transition-colors duration-200 mb-4 sm:mb-0">
+              <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+              </svg>
+              Cancel
+            </a>
+            <a href="{% url 'employees:employee_delete' employee.id %}" class="text-white bg-red-600 hover:bg-red-700 border-0 py-2 px-6 focus:outline-none rounded shadow-lg transition-colors duration-200 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Employee
+            </a>
+          </div>
+        </div>
+        
+        <!-- Employee Image/Info Section -->
+        <div class="lg:w-1/2 w-full lg:h-auto h-64 rounded-lg overflow-hidden relative bg-gray-800">
+          {% if employee.profile_image %}
+            <img alt="{{employee.first_name}} {{employee.last_name}}" class="w-full h-full object-cover object-center" src="{{employee.profile_image.url}}">
+          {% else %}
+            <div class="w-full h-full flex flex-col items-center justify-center">
+              <div class="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                <span class="text-4xl font-bold text-indigo-400">
+                  {% if employee.first_name %}
+                    {{employee.first_name|first}}{{employee.last_name|first}}
+                  {% else %}
+                    {{employee.user.username|first|upper}}
+                  {% endif %}
+                </span>
+              </div>
+              
+              <!-- Employee Stats -->
+              <div class="text-center mb-8">
+                <p class="text-gray-500">Employee ID: #{{employee.id}}</p>
+                <p class="text-gray-300 mt-2">{{employee.position|default:"No position specified"}}</p>
+              </div>
+              
+              <!-- Data Points -->
+              <div class="w-full max-w-xs">
+                <div class="flex justify-between py-2 border-t border-gray-700">
+                  <span class="text-gray-500">Department</span>
+                  <span class="text-gray-300">{{employee.department|default:"Not assigned"}}</span>
+                </div>
+                <div class="flex justify-between py-2 border-t border-gray-700">
+                  <span class="text-gray-500">Tasks</span>
+                  <span class="text-gray-300">{{employee.task_count|default:"0"}}</span>
+                </div>
+                <div class="flex justify-between py-2 border-t border-b border-gray-700">
+                  <span class="text-gray-500">Member since</span>
+                  <span class="text-gray-300">{{employee.user.date_joined|date:"M d, Y"|default:"Unknown"}}</span>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Danger Zone -->
+      <div class="lg:w-4/5 mx-auto mt-12">
+        <div class="border border-red-800 rounded-lg p-6 bg-gray-800">
+          <h3 class="text-red-500 text-lg font-medium mb-4">Danger Zone</h3>
+          <p class="text-gray-400 mb-6">The following actions cannot be undone. Please proceed with caution.</p>
+          
+          <div class="flex flex-wrap gap-4">
+            <a href="#" class="text-white bg-gray-700 hover:bg-gray-600 border-0 py-2 px-6 focus:outline-none rounded shadow-lg transition-colors duration-200 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              Deactivate Account
+            </a>
+            
+            <a href="{% url 'employees:employee_delete' employee.id %}" class="text-white bg-red-600 hover:bg-red-700 border-0 py-2 px-6 focus:outline-none rounded shadow-lg transition-colors duration-200 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Permanently Delete Employee
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

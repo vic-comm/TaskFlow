@@ -1,0 +1,91 @@
+{% extends 'base.html'%}
+{% block content%}
+<section class="text-gray-400 bg-gray-900 body-font overflow-hidden">
+    <div class="container px-5 py-12 mx-auto">
+      <div class="lg:w-4/5 mx-auto flex flex-wrap">
+        <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
+          <div class="flex items-center mb-3">
+            <span class="bg-indigo-500 text-white px-3 py-1 tracking-widest text-xs font-medium rounded">TASK</span>
+            <span class="ml-auto text-gray-400 text-sm">ID: {{task.id}}</span>
+          </div>
+          <h1 class="text-white text-3xl title-font font-medium mb-6">{{task.title}}</h1>
+          
+          <!-- Navigation Tabs -->
+          <div class="flex mb-8 border-b border-gray-700">
+            <a href='{% url "leads:task_detail" task.id%}' class="flex-grow py-2 text-center text-lg px-1 {% if request.resolver_match.url_name == 'task_detail' %}text-indigo-400 border-b-2 border-indigo-500{% else %}text-gray-400 hover:text-gray-300{% endif %}">
+              Description
+            </a>
+            <a href='{% url "leads:task_category_update" task.id%}' class="flex-grow py-2 text-center text-lg px-1 {% if request.resolver_match.url_name == 'task_category_update' %}text-indigo-400 border-b-2 border-indigo-500{% else %}text-gray-400 hover:text-gray-300{% endif %}">
+              Category
+            </a>
+            <a href='{% url "leads:task_update" task.id %}' class="flex-grow py-2 text-center text-lg px-1 {% if request.resolver_match.url_name == 'task_update' %}text-indigo-400 border-b-2 border-indigo-500{% else %}text-gray-400 hover:text-gray-300{% endif %}">
+              Details
+            </a>
+          </div>
+          
+          <!-- Form Section -->
+          <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                <div class="form-fields">
+                    {{ form.as_p|safe }}
+                </div>
+                
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded transition duration-300">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between">
+            <a href="{% url 'leads:task_list' %}" class="text-indigo-400 hover:text-indigo-300 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Tasks
+            </a>
+            <a href="{% url 'leads:task_delete' task.id %}" class="text-white bg-red-600 border-0 py-2 px-6 focus:outline-none hover:bg-red-700 rounded flex items-center transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Task
+            </a>
+          </div>
+        </div>
+        
+        <!-- Optional: Right side panel for task metadata -->
+        <div class="lg:w-1/2 w-full lg:h-auto overflow-hidden rounded-lg">
+          <div class="h-full bg-gray-800 p-6 rounded-lg">
+            <h2 class="text-lg font-medium text-white mb-4">Task Information</h2>
+            <div class="border-t border-gray-700 py-2">
+              <span class="text-gray-500">Created:</span>
+              <span class="ml-2 text-white">{{task.created_date|default:"N/A"}}</span>
+            </div>
+            <div class="border-t border-gray-700 py-2">
+              <span class="text-gray-500">Last Updated:</span>
+              <span class="ml-2 text-white">{{task.updated_date|default:"N/A"}}</span>
+            </div>
+            <div class="border-t border-gray-700 py-2">
+              <span class="text-gray-500">Status:</span>
+              <span class="ml-2 text-white">{{task.status|default:"No status"}}</span>
+            </div>
+            <div class="border-t border-gray-700 py-2">
+              <span class="text-gray-500">Assigned To:</span>
+              <span class="ml-2 text-white">{{task.assigned_to|default:"Unassigned"}}</span>
+            </div>
+            {% if task.due_date %}
+            <div class="border-t border-gray-700 py-2">
+              <span class="text-gray-500">Due Date:</span>
+              <span class="ml-2 {% if task.is_overdue %}text-red-400{% else %}text-white{% endif %}">{{task.due_date}}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

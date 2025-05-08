@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="text-gray-300 bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen">
+  <div class="container px-5 py-16 mx-auto">
+
+    <!-- Header Section -->
+    <div class="w-full mb-10 flex flex-col md:flex-row justify-between items-center border-b border-gray-700 pb-6">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-4xl font-bold text-white">Employees</h1>
+        <p class="mt-2 text-gray-400">Manage your team members and assignments</p>
+      </div>
+      <div>
+        <a href="{% url 'employees:create_employee' %}" 
+           class="inline-flex items-center px-5 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-200 text-white font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Employee
+        </a>
+      </div>
+    </div>
+
+    <!-- Employee Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+        <div class="flex items-center">
+          <div class="rounded-full bg-indigo-900 p-3 mr-4">
+            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">Total Employees</p>
+            <h3 class="text-2xl font-bold text-white">{{ object_list|length }}</h3>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Placeholder stats cards - you can replace with actual data -->
+      <div class="bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+        <div class="flex items-center">
+          <div class="rounded-full bg-green-900 p-3 mr-4">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">Active Tasks</p>
+            <h3 class="text-2xl font-bold text-white">--</h3>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+        <div class="flex items-center">
+          <div class="rounded-full bg-yellow-900 p-3 mr-4">
+            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">Pending Tasks</p>
+            <h3 class="text-2xl font-bold text-white">--</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Grid -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-white mb-6 pl-2 border-l-4 border-indigo-500">Team Members</h2>
+      
+      {% if object_list %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for employee in object_list %}
+        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+          <div class="p-6">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <div class="w-16 h-16 rounded-full bg-indigo-900 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-800 transition-colors duration-300">
+                  <!-- Person icon instead of graph icon -->
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-5 flex-1">
+                <h3 class="text-xl font-bold text-white">{{ employee.user.username }}</h3>
+                
+                <!-- Employee metadata rows -->
+                <div class="mt-3 space-y-2">
+                  <div class="flex items-center text-gray-400 text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>{{ employee.user.email|default:"No email provided" }}</span>
+                  </div>
+                  <div class="flex items-center text-gray-400 text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <span>Active Tasks: --</span>
+                  </div>
+                </div>
+                
+                <div class="mt-4 flex justify-between items-center">
+                  <a href="{% url 'employees:employee_detail' employee.id %}" 
+                     class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-200 text-white text-sm font-medium">
+                    View Profile
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                  </a>
+                  
+                  <!-- Status indicator -->
+                  <span class="px-3 py-1 text-xs rounded-full bg-green-900 text-green-300">Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <!-- Empty state -->
+      <div class="text-center py-16 bg-gray-800 rounded-xl">
+        <svg class="mx-auto h-16 w-16 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        <h3 class="mt-4 text-2xl font-medium text-gray-300">No employees yet</h3>
+        <p class="mt-2 text-lg text-gray-400">Start by adding your first team member.</p>
+        
+        <div class="mt-6">
+          <a href="{% url 'employees:create_employee' %}" 
+             class="inline-flex items-center px-5 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-200 text-white font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Employee
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}
