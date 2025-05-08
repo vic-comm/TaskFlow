@@ -41,7 +41,7 @@ SECRET_KEY = env('SECRET_KEY')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 
-ALLOWED_HOSTS = ['https://crm-website-ccg7.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['crm-website-ccg7.onrender.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
