@@ -32,7 +32,8 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # False if not in os.environ because of casting above
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
+DEBUG=True
 
 # Raises Django's ImproperlyConfigured
 # exception if SECRET_KEY not in os.environ
@@ -47,6 +48,7 @@ ALLOWED_HOSTS = ['crm-website-ccg7.onrender.com', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -54,10 +56,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'widget_tweaks',
     'crispy_forms',
     'crispy_tailwind',
     'leads.apps.LeadsConfig',
     'employees.apps.EmployeesConfig',
+    'chat.apps.ChatConfig',
+    'automation.apps.AutomationConfig',
+    'django_cleanup.apps.CleanupConfig',
+    'django_htmx',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +78,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = "crm.urls"
@@ -84,32 +93,50 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'leads.context_processors.employee_context',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = "crm.wsgi.application"
+# WSGI_APPLICATION = "crm.wsgi.application"
+ASGI_APPLICATION = 'crm.asgi.application'
 
-
+if DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        }
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": ['redis://default:tNVcOEyRcTGmvhbOAOKhdIwxaLbgzeni@redis.railway.internal:6379'],
+            },
+        },
+    }
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if not DEBUG:
-    DATABASES = {
-        'default': dj_database_url.parse(env('DATABASE_URL'))
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "NAME": env('DB_NAME'),
-            "USER": env('DB_USER'),
-            "PASSWORD": env('DB_PASSWORD'),
-            "HOST": env('DB_HOST'),
-            "PORT": env('DB_PORT'),
-        }
-    }
+}
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 
 
 # Password validation
@@ -141,11 +168,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

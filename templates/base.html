@@ -7,13 +7,44 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <!-- Tailwind CSS v3 CDN (more stable) -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.2"></script>
+
+        <style>
+            .alert-info { 
+                @apply bg-blue-300; 
+            }
+            .alert-success { 
+                @apply bg-green-400; 
+            }
+            .alert-warning { 
+                @apply bg-amber-300; 
+            }
+            .alert-danger { 
+                @apply bg-red-400; 
+            }
+            .green-dot {
+                @apply rounded-full bg-green-500 w-3 h-3;
+            }
+            .gray-dot {
+                @apply rounded-full bg-gray-500 w-3 h-3;
+            }
+            .graylight-dot {
+                @apply rounded-full bg-gray-300 w-3 h-3;
+            }
+        </style>
     </head>
     <body>
         <script src="" async defer></script>
-        <div >
+        <div>
             {% include 'navbar.html' %}
-            {% block content%}
+            {% block content %}
+            {% endblock %}
+            {% block javascript %}
             {% endblock %}
         </div>
         

@@ -29,7 +29,9 @@
                 {% csrf_token %}
                 
                 <div class="form-fields">
-                    {{ form.as_p|safe }}
+                    {% for field in form %}
+                      {{ field }}
+                    {% endfor %}
                 </div>
                 
                 <div class="flex justify-end mt-6">

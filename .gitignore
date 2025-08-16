@@ -1,3 +1,4 @@
+static_root/
 .env
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -172,4 +173,4 @@ cython_debug/
 .ruff_cache/
 
 # PyPI configuration file
-.pypirc
+.pypircstatic_root/

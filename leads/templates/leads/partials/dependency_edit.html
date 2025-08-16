@@ -1,0 +1,66 @@
+<!-- leads/partials/dependency_edit.html -->
+<div class="dependency-item bg-gray-800 border-2 border-indigo-500 p-4 rounded" id="dependency-{{ dependency.id }}">
+  <form hx-post="{% url 'leads:dependency_edit' dependency.id %}"
+        hx-target="#dependency-{{ dependency.id }}"
+        hx-swap="outerHTML">
+    {% csrf_token %}
+    
+    <div class="space-y-3">
+      <!-- From Task Field -->
+      <div>
+        <label for="id_from_task" class="block text-gray-300 text-sm font-medium mb-1">
+          From Task:
+        </label>
+        {{ form.from_task }}
+        {% if form.from_task.errors %}
+          <div class="text-red-400 text-sm mt-1">{{ form.from_task.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- To Task Field -->
+      <div>
+        <label for="id_to_task" class="block text-gray-300 text-sm font-medium mb-1">
+          To Task:
+        </label>
+        {{ form.to_task }}
+        {% if form.to_task.errors %}
+          <div class="text-red-400 text-sm mt-1">{{ form.to_task.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Dependency Type Field -->
+      <div>
+        <label for="id_dependency_type" class="block text-gray-300 text-sm font-medium mb-1">
+          Dependency Type:
+        </label>
+        {{ form.dependency_type }}
+        {% if form.dependency_type.errors %}
+          <div class="text-red-400 text-sm mt-1">{{ form.dependency_type.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Form-wide errors -->
+      {% if form.non_field_errors %}
+        <div class="bg-red-900 border border-red-700 text-red-200 px-3 py-2 rounded text-sm">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+      
+      <!-- Action Buttons -->
+      <div class="flex space-x-2 pt-2">
+        <button type="submit" 
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors">
+          Save
+        </button>
+        <button type="button" 
+        class="bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors"
+        hx-get="{% url 'leads:dependency_edit' dependency.id %}?cancel=true"
+        hx-target="#dependency-{{ dependency.id }}"
+        hx-swap="outerHTML">
+        Cancel
+        </button>
+
+      </div>
+    </div>
+  </form>
+</div>

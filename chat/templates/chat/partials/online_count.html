@@ -1,0 +1,25 @@
+<span id="online-count" hx-swap-oob="outerHTML" class="pr-1">{{ online_count }}</span>
+
+{% if online_count %}
+<div class='green-dot absolute top-2 left-2' id='online_icon'></div>
+{% else %}
+<div class='gray-dot absolute top-2 left-2' id='online_icon'></div>
+{% endif %}
+
+<ul class='flex gap-4' id='groupchat-members'>
+    {% for member in chat_group.members.all %}
+        <li>
+            <a href={% url "employees:employee_detail" member.id %} class='flex flex-col text-gray-400 items-center justify-center w-20 gap-2'>
+                <div class='relative'>
+                    {% if member in chat_group.members.all %}
+                    <div class='green-dot border-2 border-gray-800 absolute bottom-0 right-0'></div>
+                    {% else %}
+                    <div class='green-dot border-2 border-gray-800 absolute bottom-0 right-0'></div>
+                    {% endif %}
+                </div>
+
+                {{ member.first_name}}
+            </a>
+        </li>
+    {% endfor %}
+</ul>

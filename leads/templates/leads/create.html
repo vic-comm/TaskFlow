@@ -1,91 +1,213 @@
 {% extends 'base.html'%}
+{%load task_tags %}
 {% block content %}
-<div class="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-md space-y-6">
-    <div class="text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-auto w-12 h-12 text-white p-2 bg-indigo-500 rounded-full" viewBox="0 0 24 24">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-      </svg>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Create a Task</h2>
+<div class="min-h-screen bg-gradient-to-br from-slate-900 to-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-2xl">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex items-center justify-center mb-6">
+        <div class="flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-center text-4xl font-bold tracking-tight text-white mb-2">
+        Create New Task
+      </h1>
+      <p class="text-center text-lg text-slate-300 max-w-md mx-auto">
+        Define project requirements, assign responsibilities, and set delivery expectations
+      </p>
     </div>
-    <div class="mt-8 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-      <form method="post" action="." class="space-y-6">
-        {% csrf_token %}
-        <div class="space-y-6">
-          {% for field in form %}
-            <div class="form-group">
-              <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-              </label>
-              
-              <!-- This is the styled wrapper div for our form field -->
-              <div class="field-wrapper border-2 border-gray-300 rounded-md shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
-                {{ field }}
+
+    <!-- Form Card -->
+    <div class="bg-slate-800 rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+      <div class="px-8 py-10 sm:px-12 sm:py-12">
+        <form method="post" action="." class="space-y-8" enctype='multipart/form-data'>
+          {% csrf_token %}
+          
+          <div class="space-y-8">
+            {% for field in task_form %}
+              <div class="form-group">
+                {% if not field.name == 'create_group_chat'%}
+                  <label for="{{ field.id_for_label }}" class="block text-base font-semibold text-slate-200 mb-3">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                      <span class="text-red-500 ml-1">*</span>
+                    {% endif %}
+                  </label>
+                  
+                  {% if field|widget_type == "checkboxselectmultiple" %}
+                    <!-- Enhanced checkbox rendering -->
+                    <div class="space-y-3 bg-slate-700 rounded-xl p-6 border border-slate-600">
+                      {% for subwidget in field.subwidgets %}
+                        <label class="flex items-center space-x-3 cursor-pointer group">
+                          <div class="relative">
+                            {{ subwidget.tag }}
+                            <div class="absolute inset-0 rounded border-2 border-slate-500 group-hover:border-slate-400 transition-colors"></div>
+                          </div>
+                          <span class="text-base text-slate-200 group-hover:text-white transition-colors">
+                            {{ subwidget.choice_label }}
+                          </span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <!-- Enhanced field wrapper -->
+                    <div class="field-wrapper relative bg-slate-900 border-2 border-slate-600 rounded-xl shadow-sm transition-all duration-200 focus-within:border-slate-400 focus-within:ring-4 focus-within:ring-slate-500/20 hover:border-slate-500">
+                      {{ field }}
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+                {% if field.help_text %}
+                  <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+                    <svg class="inline w-4 h-4 mr-1 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    {{ field.help_text }}
+                  </p>
+                {% endif %}
+                
+                {% if field.errors %}
+                  <div class="mt-3 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg">
+                    {% for error in field.errors %}
+                      <p class="text-sm text-red-700 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        {{ error }}
+                      </p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
-              
-              {% if field.help_text %}
-                <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
-              {% endif %}
-              
-              {% if field.errors %}
-                <div class="mt-2 text-sm text-red-600">
-                  {% for error in field.errors %}
-                    <p>{{ error }}</p>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-          {% endfor %}
-        </div>
-        
-        <div class="mt-6">
-          <button type="submit" class="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-              <!-- Document icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </span>
-            Submit
-          </button>
-        </div>
-      </form>
+            {% endfor %}
+            
+            {% for field in document_form %}
+              {{ field }}
+            {% endfor %}
+          </div>
+
+          <!-- Group Chat Toggle Section -->
+          <div id="group-chat-toggle" class="bg-slate-700 rounded-xl p-6 border border-slate-600">
+            <!-- HTMX will replace this div's content -->
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-6 border-t border-slate-600">
+            <button type="submit" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-semibold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-white/20 group">
+              <span class="flex items-center justify-center space-x-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class="text-lg">Create Task</span>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-slate-400">
+        Fields marked with <span class="text-red-400">*</span> are required for task creation
+      </p>
     </div>
   </div>
 </div>
 
 <style>
-  /* Custom CSS to style the form fields */
+  /* Enhanced form field styling */
   .field-wrapper input,
   .field-wrapper select,
   .field-wrapper textarea {
     width: 100%;
-    padding: 0.5rem 0.75rem;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
     appearance: none;
     background-color: transparent;
     border: none;
     outline: none;
+    color: #e2e8f0;
+    font-weight: 500;
+  }
+  
+  .field-wrapper textarea {
+    min-height: 120px;
+    resize: vertical;
   }
   
   .field-wrapper select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
     background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
+    background-size: 1.25em 1.25em;
+    padding-right: 3rem;
+    cursor: pointer;
   }
 
-  /* Handle checkboxes and radio buttons differently */
+  /* Enhanced placeholder styling */
+  .field-wrapper input::placeholder,
+  .field-wrapper textarea::placeholder {
+    color: #64748b;
+    font-weight: 400;
+  }
+
+  /* Checkbox and radio button enhancements */
   .field-wrapper input[type="checkbox"],
   .field-wrapper input[type="radio"] {
-    width: auto;
-    margin-right: 0.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0;
+    cursor: pointer;
+    accent-color: #e2e8f0;
   }
   
-  /* Focus states for the wrapper */
+  /* File input styling */
+  .field-wrapper input[type="file"] {
+    padding: 0.75rem;
+    cursor: pointer;
+  }
+  
+  /* Focus and hover enhancements */
+  .field-wrapper:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 1px 3px 0 rgba(255, 255, 255, 0.1);
+  }
+  
   .field-wrapper:focus-within {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    border-color: #cbd5e1;
+    background-color: #1e293b;
+  }
+
+  /* Smooth transitions */
+  .field-wrapper,
+  .field-wrapper input,
+  .field-wrapper select,
+  .field-wrapper textarea {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Modern scrollbar for webkit browsers */
+  .field-wrapper textarea::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .field-wrapper textarea::-webkit-scrollbar-track {
+    background: #334155;
+    border-radius: 3px;
+  }
+  
+  .field-wrapper textarea::-webkit-scrollbar-thumb {
+    background: #64748b;
+    border-radius: 3px;
+  }
+  
+  .field-wrapper textarea::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 </style>
 {% endblock %}

@@ -6,7 +6,7 @@
         <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
           <div class="flex items-center mb-6">
             <div class="bg-indigo-500 text-white px-3 py-1 rounded-md text-sm font-medium mr-3">
-              EMPLOYEE
+              {{employee.user.username}}
             </div>
             {% if employee %}
               <span class="bg-green-900 text-green-300 px-3 py-1 rounded-md text-xs font-medium">Active</span>
@@ -18,8 +18,10 @@
           
           <div class="flex mb-6 border-b border-gray-800">
             <a class="flex-grow text-indigo-400 border-b-2 border-indigo-500 py-2 text-lg px-1 font-medium">Profile</a>
+            {% if employee.user.id == request.user.id %}
             <a href='{% url "employees:employee_update" employee.id %}' class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1 hover:text-indigo-400 transition-colors duration-200">Edit Details</a>
-            <a href="#tasks" class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1 hover:text-indigo-400 transition-colors duration-200">Tasks</a>
+            {% endif %}
+            <a href="" class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1 hover:text-indigo-400 transition-colors duration-200">Tasks</a>
           </div>
           
           <div class="flex flex-col gap-4 mb-6">
@@ -71,8 +73,8 @@
           </div>
         </div>
         <div class="lg:w-1/2 w-full lg:h-auto h-64 rounded-lg overflow-hidden relative bg-gray-800">
-          {% if employee.profile_image %}
-            <img alt="{{employee.firstname}} {{employee.lastname}}" class="w-full h-full object-cover object-center" src="{{employee.profile_image.url}}">
+          {% if employee.user.avatar %}
+            <img alt="{{employee.firstname}} {{employee.lastname}}" class="w-full h-full object-cover object-center" src="{{employee.user.avatar.url}}">
           {% else %}
             <div class="w-full h-full flex flex-col items-center justify-center">
               <div class="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center mb-4">

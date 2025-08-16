@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 py-12 px-4">
+  <div class="max-w-md mx-auto">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-slate-700 to-gray-800 rounded-lg mb-4 shadow-lg border border-gray-600">
+        <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+      </div>
+      <h2 class="text-3xl font-bold text-white mb-2">Create Your Company</h2>
+      <p class="text-gray-400">Let's get your business started with a few details</p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-gray-800/90 backdrop-blur-sm p-8 rounded-lg shadow-2xl border border-gray-700">
+      <form method="post" action="." class="space-y-6">
+        {% csrf_token %}
+        
+        {% for field in form %}
+          <div class="group">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ field.label }}
+              {% if field.field.required %}
+                <span class="text-red-400 ml-1">*</span>
+              {% endif %}
+            </label>
+            
+            <div class="relative">
+              <div class="relative">
+                {{ field }}
+              </div>
+            </div>
+            
+            {% if field.help_text %}
+              <p class="mt-2 text-sm text-gray-500 flex items-center">
+                <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {{ field.help_text }}
+              </p>
+            {% endif %}
+            
+            {% if field.errors %}
+              <div class="mt-2 space-y-1">
+                {% for error in field.errors %}
+                  <p class="text-sm text-red-400 flex items-center">
+                    <svg class="w-4 h-4 mr-1.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    {{ error }}
+                  </p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <!-- Submit Button -->
+        <div class="pt-6">
+          <button type="submit" class="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 shadow-lg">
+            Create Company
+          </button>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="text-center pt-4">
+          <p class="text-xs text-gray-500">
+            By creating a company, you agree to our 
+            <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Terms of Service</a> 
+            and 
+            <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Privacy Policy</a>
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-gray-600">
+        Need help? 
+        <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Contact our support team</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Enhanced form field styling */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #374151;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="tel"]:hover,
+input[type="url"]:hover,
+input[type="password"]:hover,
+input[type="number"]:hover,
+textarea:hover,
+select:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px 12px;
+  padding-right: 40px;
+}
+
+/* Checkbox and radio styling */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  accent-color: #4f46e5;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.group:hover .absolute {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Enhanced focus states */
+.group-focus-within label {
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: all 0.2s ease;
+}
+
+/* Custom scrollbar for better aesthetics */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #4f46e5, #7c3aed);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #4338ca, #6d28d9);
+}
+</style>
+{% endblock %}

@@ -25,14 +25,17 @@ import django.contrib.auth.views as auth_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('leads/', include('leads.urls',namespace='leads')),
+    path('workflow/', include('automation.urls', namespace='workflow')),
     path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('signup/', views.SignupView.as_view(), name='signup'),
+    path('create_company/', views.CompanyCreationView.as_view(), name='create_company'),
     path('employees/', include('employees.urls', namespace='employees')),
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('chat_room/', include('chat.urls', namespace='chat')),
 
 
 ]
