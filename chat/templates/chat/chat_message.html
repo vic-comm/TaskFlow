@@ -1,50 +1,125 @@
-{% if message.author == request.user %}
-<li class="flex justify-end mb-4">
-    <div class="bg-green-200 rounded-l-lg rounded-tr-lg p-4 max-w-[75%]">
-        {% if message.body %}
-            <span>{{ message.body }}</span>
-        {% elif message.file %}
-            {% if message.is_image %}
-                <img class="max-w-72 min-w-8" src="{{ message.file.url }}" />
-            {% else %}
-                &#x1F4CE; <a class="cursor-pointer italic hover:underline" href="{{ message.file.url }}" download>{{ message.filename }}</a>
-            {% endif %} 
-        {% endif %}
-    </div>
-    <div class="flex items-end">
-        <svg height="13" width="8" >
-            <path fill="#bbf7d0" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z"/>
-        </svg>
+{% if message.author.id == user.id %}
+<!-- User's own message (right-aligned) -->
+<li class="flex justify-end mb-4 group">
+    <div class="flex flex-col max-w-[75%]">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-md p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+            {% if message.body %}
+                <div class="whitespace-pre-wrap break-words">{{ message.body }}</div>
+
+            {% elif message.file %}
+                {% if message.is_image %}
+                    <div class="rounded-lg overflow-hidden">
+                        <img class="max-w-72 min-w-16 w-full h-auto object-cover" 
+                             src="{{ message.file.url }}" 
+                             alt="Shared image"
+                             loading="lazy" />
+                    </div>
+                {% else %}
+                    <div class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg">
+                        <svg class="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                        </svg>
+                        <a class="text-white hover:text-white/80 transition-colors duration-200 font-medium truncate" 
+                           href="{{ message.file.url }}" 
+                           download="{{ message.filename }}"
+                           title="{{ message.filename }}">
+                            {{ message.filename }}
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="flex justify-end mt-1">
+            <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                {{ message.created|date:"g:i A" }}
+            </span>
+        </div>
     </div>
 </li>
 {% else %}
-<li>
-    <div class="flex justify-start">
-        <div class="flex items-end mr-2" >
-            <a href="">
-                <img class="w-8 h-8 rounded-full object-cover" src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg">
-            </a>
-        </div>
-        <div class="flex items-end" >
-            <svg height="13" width="8" >
-                <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
-            </svg>
-        </div>
-        <div class="bg-white p-4 max-w-[75%] rounded-r-lg rounded-tl-lg">
-            {% if message.body %}
-                <span>{{ message.body }}</span>
-            {% elif message.file %}
-                {% if message.is_image %}
-                    <img class="max-w-72 min-w-8" src="{{ message.file.url }}" />
-                {% else %}
-                    &#x1F4CE; <a class="cursor-pointer italic hover:underline" href="{{ message.file.url }}" download>{{ message.filename }}</a>
+<!-- Other user's message (left-aligned) -->
+{% comment %} <li class="mb-4 group">
+    <div class="flex items-start space-x-3">        
+        <div class="flex flex-col max-w-[75%]">
+            <!-- Message content -->
+            <div class="bg-white border border-gray-200 rounded-2xl rounded-bl-md p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                {% if message.body %}
+                    <div class="text-gray-800 whitespace-pre-wrap break-words">{{ message.body }}</div>
+                {% elif message.file %}
+                    {% if message.is_image %}
+                        <div class="rounded-lg overflow-hidden">
+                            <img class="max-w-72 min-w-16 w-full h-auto object-cover" 
+                                 src="{{ message.file.url }}" 
+                                 alt="Shared image"
+                                 loading="lazy" />
+                        </div>
+                    {% else %}
+                        <div class="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                            <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                            </svg>
+                            <a class="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium truncate" 
+                               href="{{ message.file.url }}" 
+                               download="{{ message.filename }}"
+                               title="{{ message.filename }}">
+                                {{ message.filename }}
+                            </a>
+                        </div>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </div>  
+            </div>
+            
+            <!-- Message metadata -->
+            <div class="flex items-center justify-between mt-1 px-1">
+                <span class="text-sm text-gray-600 font-medium">@{{ message.author.username }}</span>
+                <span class="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    {{ message.created_at|date:"g:i A" }}
+                </span>
+            </div>
+        </div>
     </div>
-    <div class="text-sm font-light py-1 ml-10">
-        <span class="text-white">{{message.author.first_name}}</span> 
-        <span class="text-gray-400">@bart</span>
+</li>
+{% endif %} {% endcomment %}
+<!-- Other user's message (left-aligned) -->
+<li class="mb-4 group">
+    <div class="flex items-start space-x-3">        
+        <div class="flex flex-col max-w-[75%]">
+            <!-- Message content -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl rounded-bl-md p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                {% if message.body %}
+                    <div class="text-white whitespace-pre-wrap break-words">{{ message.body }}</div>
+                {% elif message.file %}
+                    {% if message.is_image %}
+                        <div class="rounded-lg overflow-hidden">
+                            <img class="max-w-72 min-w-16 w-full h-auto object-cover" 
+                                 src="{{ message.file.url }}" 
+                                 alt="Shared image"
+                                 loading="lazy" />
+                        </div>
+                    {% else %}
+                        <div class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg">
+                            <svg class="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                            </svg>
+                            <a class="text-white hover:text-white/80 transition-colors duration-200 font-medium truncate" 
+                               href="{{ message.file.url }}" 
+                               download="{{ message.filename }}"
+                               title="{{ message.filename }}">
+                                {{ message.filename }}
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            
+            <!-- Message metadata -->
+            <div class="flex items-center justify-between mt-1 px-1">
+                <span class="text-sm text-white font-medium">@{{ message.author.username }}</span>
+                <span class="text-xs text-white/80">
+                    {{ message.created_at|date:"g:i A" }}
+                </span>
+            </div>
+        </div>
     </div>
 </li>
 {% endif %}

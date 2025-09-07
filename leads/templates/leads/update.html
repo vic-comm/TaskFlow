@@ -1,4 +1,5 @@
 {% extends 'base.html'%}
+{% comment %} {% extends 'base.html'%}
 {% block content%}
 <section class="text-gray-400 bg-gray-900 body-font overflow-hidden">
     <div class="container px-5 py-12 mx-auto">
@@ -14,9 +15,6 @@
           <div class="flex mb-8 border-b border-gray-700">
             <a href='{% url "leads:task_detail" task.id%}' class="flex-grow py-2 text-center text-lg px-1 {% if request.resolver_match.url_name == 'task_detail' %}text-indigo-400 border-b-2 border-indigo-500{% else %}text-gray-400 hover:text-gray-300{% endif %}">
               Description
-            </a>
-            <a href='{% url "leads:task_category_update" task.id%}' class="flex-grow py-2 text-center text-lg px-1 {% if request.resolver_match.url_name == 'task_category_update' %}text-indigo-400 border-b-2 border-indigo-500{% else %}text-gray-400 hover:text-gray-300{% endif %}">
-              Category
             </a>
             <a href='{% url "leads:task_update" task.id %}' class="flex-grow py-2 text-center text-lg px-1 {% if request.resolver_match.url_name == 'task_update' %}text-indigo-400 border-b-2 border-indigo-500{% else %}text-gray-400 hover:text-gray-300{% endif %}">
               Details
@@ -90,4 +88,432 @@
       </div>
     </div>
   </section>
+{% endblock %} {% endcomment %}
+{% block content%}
+<section class="text-gray-400 bg-gray-900 body-font overflow-hidden min-h-screen">
+    <div class="container px-5 py-12 mx-auto">
+      <div class="lg:w-4/5 mx-auto flex flex-wrap">
+        <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
+          <!-- Header Section -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <span class="bg-indigo-500 text-white px-3 py-1 tracking-widest text-xs font-medium rounded uppercase">Task</span>
+              <span class="ml-3 text-gray-400 text-sm font-mono">ID: {{task.id}}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              {% if task.status %}
+                <span class="px-2 py-1 text-xs font-medium rounded-full
+                  {% if task.status == 'completed' %}bg-green-100 text-green-800
+                  {% elif task.status == 'in_progress' %}bg-blue-100 text-blue-800
+                  {% elif task.status == 'pending' %}bg-yellow-100 text-yellow-800
+                  {% else %}bg-gray-100 text-gray-800{% endif %}">
+                  {{task.status|title}}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <h1 class="text-white text-3xl title-font font-medium mb-6 leading-tight">{{task.title}}</h1>
+          
+          <!-- Navigation Tabs -->
+          <div class="flex mb-8 border-b border-gray-700">
+            <a href='{% url "leads:task_detail" task.id%}' 
+               class="flex-grow py-3 text-center text-lg px-1 font-medium relative
+                      {% if request.resolver_match.url_name == 'task_detail' %}
+                        text-indigo-400 border-b-2 border-indigo-500
+                      {% else %}
+                        text-gray-400 hover:text-gray-300
+                      {% endif %}">
+              <svg class="w-5 h-5 inline-block mr-2 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Description
+            </a>
+            <a href='{% url "leads:task_update" task.id %}' 
+               class="flex-grow py-3 text-center text-lg px-1 font-medium relative
+                      {% if request.resolver_match.url_name == 'task_update' %}
+                        text-indigo-400 border-b-2 border-indigo-500
+                      {% else %}
+                        text-gray-400 hover:text-gray-300
+                      {% endif %}">
+              <svg class="w-5 h-5 inline-block mr-2 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              Details
+            </a>
+          </div>
+          
+          <!-- Form Section -->
+          <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <h2 class="text-white text-xl font-semibold mb-6 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              Edit Task Details
+            </h2>
+            
+            {% if form.errors %}
+              <div class="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg">
+                <div class="flex items-center mb-2">
+                  <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <h3 class="text-red-400 font-medium">Please correct the following errors:</h3>
+                </div>
+                <ul class="text-red-300 text-sm">
+                  {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                      <li class="ml-4">{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Title Field -->
+                <div class="form-group">
+                  <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Task Title *
+                  </label>
+                  <input type="text" 
+                         name="{{ form.title.name }}" 
+                         id="{{ form.title.id_for_label }}"
+                         value="{{ form.title.value|default:'' }}"
+                         class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                         placeholder="Enter a descriptive task title"
+                         required>
+                  {% if form.title.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.title.errors.0 }}</p>
+                  {% endif %}
+                </div>
+                
+                <!-- Description Field -->
+                <div class="form-group">
+                  <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Description
+                  </label>
+                  <textarea name="{{ form.description.name }}" 
+                            id="{{ form.description.id_for_label }}"
+                            rows="4"
+                            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-vertical"
+                            placeholder="Provide detailed information about this task...">{{ form.description.value|default:'' }}</textarea>
+                  {% if form.description.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.description.errors.0 }}</p>
+                  {% endif %}
+                </div>
+                
+                <!-- Date Fields Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Start Date -->
+                  <div class="form-group">
+                    <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                      Start Date *
+                    </label>
+                    <input type="date" 
+                           name="{{ form.start_date.name }}" 
+                           id="{{ form.start_date.id_for_label }}"
+                           value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                           required>
+                    {% if form.start_date.errors %}
+                      <p class="mt-1 text-sm text-red-400">{{ form.start_date.errors.0 }}</p>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- End Date -->
+                  <div class="form-group">
+                    <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                      End Date *
+                    </label>
+                    <input type="date" 
+                           name="{{ form.end_date.name }}" 
+                           id="{{ form.end_date.id_for_label }}"
+                           value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                           required>
+                    {% if form.end_date.errors %}
+                      <p class="mt-1 text-sm text-red-400">{{ form.end_date.errors.0 }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <!-- Assigned To Field -->
+                <div class="form-group">
+                  <label class="block text-sm font-medium text-gray-300 mb-3">
+                    Assign To Team Members
+                  </label>
+                  <div class="space-y-3 max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-4 border border-gray-600">
+                    {% for choice in form.assigned_to %}
+                      <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="{{ choice.data.name }}" 
+                               value="{{ choice.data.value }}" 
+                               id="{{ choice.data.attrs.id }}"
+                               {% if choice.data.selected %}checked{% endif %}
+                               class="h-4 w-4 text-indigo-600 bg-gray-600 border-gray-500 rounded focus:ring-indigo-500 focus:ring-2"
+                               hx-post="{% url 'leads:htmx_check' %}"
+                               hx-trigger="change"
+                               hx-target="#group-chat-toggle"
+                               hx-include="closest form">
+                        <label for="{{ choice.data.attrs.id }}" class="ml-3 text-gray-300 cursor-pointer select-none">
+                          {{ choice.choice_label }}
+                        </label>
+                      </div>
+                    {% empty %}
+                      <p class="text-gray-500 text-sm italic">No team members available</p>
+                    {% endfor %}
+                  </div>
+                  {% if form.assigned_to.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.assigned_to.errors.0 }}</p>
+                  {% endif %}
+                </div>
+                
+                <!-- Group Chat Toggle -->
+                <div id="group-chat-toggle" class="form-group">
+                  <div class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg border border-gray-600">
+                    <input type="checkbox" 
+                           name="{{ form.create_group_chat.name }}" 
+                           id="{{ form.create_group_chat.id_for_label }}"
+                           {% if form.create_group_chat.value %}checked{% endif %}
+                           class="h-4 w-4 text-indigo-600 bg-gray-600 border-gray-500 rounded focus:ring-indigo-500 focus:ring-2">
+                    <div class="flex-1">
+                      <label for="{{ form.create_group_chat.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
+                        Create Group Chat
+                      </label>
+                      <p class="text-gray-500 text-sm mt-1">
+                        Automatically create a group chat with assigned team members
+                      </p>
+                    </div>
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2m0-4h6v4H9V4z"></path>
+                    </svg>
+                  </div>
+                  {% if form.create_group_chat.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.create_group_chat.errors.0 }}</p>
+                  {% endif %}
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-700">
+                    <button type="submit" 
+                            class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 text-white bg-indigo-600 hover:bg-indigo-700 border border-indigo-600 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Save Changes
+                    </button>
+                    <a href="{% url 'leads:task_list' %}" 
+                       class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 text-gray-300 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+          </div>
+          
+          <!-- Danger Zone -->
+          <div class="bg-red-900 bg-opacity-20 border border-red-700 rounded-lg p-4">
+            <h3 class="text-red-400 font-medium mb-2 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+              Danger Zone
+            </h3>
+            <p class="text-red-300 text-sm mb-3">This action cannot be undone. This will permanently delete the task and all associated data.</p>
+            <a href="{% url 'leads:task_delete' task.id %}" 
+               class="inline-flex items-center px-4 py-2 text-white bg-red-600 hover:bg-red-700 border border-red-600 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+               onclick="return confirm('Are you sure you want to delete this task? This action cannot be undone.')">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Delete Task
+            </a>
+          </div>
+        </div>
+        
+        <!-- Task Information Panel -->
+        <div class="lg:w-1/2 w-full lg:h-auto">
+          <div class="h-full bg-gray-800 p-6 rounded-lg border border-gray-700 sticky top-6">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Task Information
+            </h2>
+            
+            <div class="space-y-4">
+              <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                <span class="text-gray-400 font-medium">Created</span>
+                <span class="text-white">
+                  {% if task.created_date %}
+                    {{ task.created_date|date:"M d, Y" }}
+                    <span class="text-gray-500 text-sm block">{{ task.created_date|date:"g:i A" }}</span>
+                  {% else %}
+                    <span class="text-gray-500">N/A</span>
+                  {% endif %}
+                </span>
+              </div>
+              
+              <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                <span class="text-gray-400 font-medium">Last Updated</span>
+                <span class="text-white">
+                  {% if task.updated_date %}
+                    {{ task.updated_date|date:"M d, Y" }}
+                    <span class="text-gray-500 text-sm block">{{ task.updated_date|date:"g:i A" }}</span>
+                  {% else %}
+                    <span class="text-gray-500">N/A</span>
+                  {% endif %}
+                </span>
+              </div>
+              
+              <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                <span class="text-gray-400 font-medium">Current Status</span>
+                <span class="{% if task.status %}text-white{% else %}text-gray-500{% endif %}">
+                  {{ task.status|title|default:"No status" }}
+                </span>
+              </div>
+              
+              <div class="flex justify-between items-start py-3 border-b border-gray-700">
+                <span class="text-gray-400 font-medium">Currently Assigned</span>
+                <div class="text-right">
+                  {% if task.assigned_to.all %}
+                    {% for emp in task.assigned_to.all %}
+                      <span class="inline-block px-2 py-1 bg-indigo-600 text-white text-xs rounded-full mb-1">
+                        {{ emp.user.get_full_name|default:emp.user.username }}
+                      </span>
+                      {% if not forloop.last %}<br>{% endif %}
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-gray-500">Unassigned</span>
+                  {% endif %}
+                </div>
+              </div>
+              
+              {% if task.start_date or task.end_date %}
+              <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                <span class="text-gray-400 font-medium">Timeline</span>
+                <div class="text-right text-white">
+                  {% if task.start_date %}
+                    <div class="text-sm">
+                      <span class="text-gray-500">Start:</span> {{ task.start_date|date:"M d, Y" }}
+                    </div>
+                  {% endif %}
+                  {% if task.end_date %}
+                    <div class="text-sm">
+                      <span class="text-gray-500">End:</span> 
+                      <span class="{% if task.is_overdue %}text-red-400{% else %}text-white{% endif %}">
+                        {{ task.end_date|date:"M d, Y" }}
+                      </span>
+                    </div>
+                  {% endif %}
+                  {% if task.due_date %}
+                    <div class="text-sm">
+                      <span class="text-gray-500">Due:</span> 
+                      <span class="{% if task.is_overdue %}text-red-400{% else %}text-white{% endif %}">
+                        {{ task.due_date|date:"M d, Y" }}
+                      </span>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endif %}
+              
+              <!-- Progress Indicator (if applicable) -->
+              {% comment %} {% if task.progress %}
+              <div class="py-3">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-400 font-medium">Progress</span>
+                  <span class="text-white">{{ task.progress }}%</span>
+                </div>
+                <div class="w-full bg-gray-600 rounded-full h-2">
+                  <div class="bg-indigo-600 h-2 rounded-full" style="width: {{ task.progress }}%"></div>
+                </div>
+              </div>
+              {% endif %} {% endcomment %}
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="mt-6 pt-6 border-t border-gray-700">
+              <h3 class="text-gray-300 font-medium mb-3">Quick Actions</h3>
+              <div class="space-y-2">
+                <a href="{% url 'leads:task_detail' task.id %}" 
+                   class="w-full inline-flex items-center justify-center px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-500">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  View Full Details
+                </a>
+                {% if task.assigned_to.all %}
+                <button type="button" 
+                        class="w-full inline-flex items-center justify-center px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        onclick="window.open('mailto:{{ task.assigned_to.all|join:', ' }}?subject=Task: {{ task.title|urlencode }}', '_blank')">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  Email Assignees
+                </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<style>
+/* Custom styles for better form appearance */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Custom checkbox styles */
+input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-6.5 6.5a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7 9.293l6.146-6.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
+}
+
+/* Smooth focus states */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Hover effects for interactive elements */
+.form-group label {
+  cursor: pointer;
+}
+
+/* Better scrollbar for assigned users */
+.space-y-3::-webkit-scrollbar {
+  width: 6px;
+}
+
+.space-y-3::-webkit-scrollbar-track {
+  background: rgba(75, 85, 99, 0.3);
+  border-radius: 3px;
+}
+
+.space-y-3::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.6);
+  border-radius: 3px;
+}
+
+.space-y-3::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.8);
+}
+</style>
 {% endblock %}

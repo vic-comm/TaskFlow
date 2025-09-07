@@ -1,3 +1,5 @@
+{% load static tailwind_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -7,11 +9,12 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
-        <!-- Tailwind CSS v3 CDN (more stable) -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        
+        {% comment %} <script src="https://cdn.tailwindcss.com"></script> {% endcomment %}
+        {% tailwind_css %}
+        {% comment %} <script src='C:\Dev\projects\crm_website\static_root\admin\js\htmx.min.js'> {% endcomment %}
+        <script src="{% static 'js/htmx.min.js' %}"></script>
         <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
-        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+        {% comment %} <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script> {% endcomment %}
         <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.2"></script>
 
         <style>

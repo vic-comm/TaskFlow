@@ -32,8 +32,8 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # False if not in os.environ because of casting above
-# DEBUG = env('DEBUG')
-DEBUG=True
+DEBUG = env('DEBUG')
+
 
 # Raises Django's ImproperlyConfigured
 # exception if SECRET_KEY not in os.environ
@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'cloudinary_storage',
+    'cloudinary',
     'widget_tweaks',
     'crispy_forms',
     'crispy_tailwind',
@@ -66,7 +68,15 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     'django_htmx',
     'channels',
+    'tailwind',
+    'theme',
 ]
+TAILWIND_APP_NAME='theme'
+NPM_BIN_PATH= r"C:\Program Files\nodejs\npm.cmd"
+
+if DEBUG:
+    # Add django_browser_reload only in DEBUG mode
+    INSTALLED_APPS += ['django_browser_reload']
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -81,6 +91,11 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
+if DEBUG:
+    # Add django_browser_reload middleware only in DEBUG mode
+    MIDDLEWARE += [
+        "django_browser_reload.middleware.BrowserReloadMiddleware",
+    ]
 ROOT_URLCONF = "crm.urls"
 
 TEMPLATES = [
@@ -101,6 +116,7 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = "crm.wsgi.application"
 ASGI_APPLICATION = 'crm.asgi.application'
+REDIS_URL=env('REDIS_URL')
 
 if DEBUG:
     CHANNEL_LAYERS = {
@@ -113,20 +129,34 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": ['redis://default:tNVcOEyRcTGmvhbOAOKhdIwxaLbgzeni@redis.railway.internal:6379'],
+                "hosts": [REDIS_URL]
             },
         },
     }
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SSL": True,
+        }
     }
 }
 
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+DATABASES = {'default': dj_database_url.parse(env('DATABASE_URL'), conn_max_age=600, ssl_require=True)}
 
 STORAGES = {
     "default": {
@@ -136,7 +166,6 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
 
 
 # Password validation
@@ -168,16 +197,27 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+MEDIA_URL = '/media/'
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / "media"
+else:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.RawMediaCloudinaryStorage'
 
-
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': env('CLOUDINARY_API_KEY'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET'),
+}
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static'
-# ]
-STATIC_ROOT = 'static_root'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+STATIC_ROOT = BASE_DIR / 'static_root'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

@@ -15,7 +15,7 @@
 
     <!-- Form Container -->
     <div class="bg-gray-800/90 backdrop-blur-sm p-8 rounded-lg shadow-2xl border border-gray-700">
-      <form method="post" action="." class="space-y-6">
+      <form method="post" action="." class="space-y-6" enctype='multipart/form-data'>
         {% csrf_token %}
         
         {% for field in form %}

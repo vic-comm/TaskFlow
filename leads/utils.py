@@ -1,5 +1,5 @@
-from .models import TaskDependency
 def has_circular_task(from_task, to_task, visited=None):
+    from .models import TaskDependency
     if visited is None:
         visited = set()
     

@@ -42,7 +42,7 @@
             <a class="flex-grow text-center text-indigo-400 border-b-2 border-indigo-500 py-2 px-1 font-medium">
               Description
             </a>
-            <a href='{% url "leads:task_update" task.id %}' class="flex-grow text-center text-gray-400 hover:text-gray-200 py-2 px-1 font-medium transition-colors">
+            <a href= {% if employee.role == 'manager' %}'{% url "leads:task_update" task.id %}' {% else %} '#' {% endif %} class="flex-grow text-center text-gray-400 hover:text-gray-200 py-2 px-1 font-medium transition-colors">
               Edit
             </a>
           </div>
@@ -75,34 +75,64 @@
               <span class="ml-auto text-white font-medium">{{ task.end_date }}</span>
             </div>
             
-            <div class="flex py-3 border-b border-gray-700">
+            {% comment %} <div class="flex py-3 border-b border-gray-700">
               <div class="flex items-center">
                 <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
                 <span class="text-gray-400">Assigned to</span>
               </div>
-              <span class="ml-auto text-white font-medium">{{ task.assigned_to }}</span>
-            </div>
+              <div class="flex items-center space-x-1">
+              {% for employee in task.assigned_to.all %}
+                <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium" title="{{ user.get_full_name|default:user.username }}">
+                  {{ employee.user.first_name|default:employee.user.username }}
+                </div>
+              {% endfor %}
+              </div>
+            </div> {% endcomment %}
+              <div class="flex py-3 border-b border-gray-700">
+              <div class="flex items-center">
+                <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                  </path>
+                </svg>
+                <span class="text-gray-400">Assigned to</span>
+              </div>
+                <div class="ml-auto text-white font-medium">
+                  {% for employee in task.assigned_to.all %}
+                    {{ employee.user.get_full_name|default:employee.user.username }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    <span class="text-gray-500">No one assigned</span>
+                  {% endfor %}
+                </div>
+              </div>
+
           </div>
 
           <!-- Action buttons -->
           <div class="flex flex-wrap gap-4">
+            {% if employee.role == 'manager'%}
             <a href="{% url 'leads:task_update' task.id %}" class="flex-grow sm:flex-grow-0 text-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200">
               Edit Task
             </a>
-            {% if task.employee %}
-            <a href="#" class="flex-grow sm:flex-grow-0 text-center px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors duration-200">
-              Reassign
+            {% endif %}
+            {% if employee in task.assigned_to.all and task.status != 'completed' and task.status != 'pending_approval' %}
+            <a href="{% url 'leads:task_approval' task.pk%}" class="flex-grow sm:flex-grow-0 text-center px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors duration-200">
+              Submit Task
             </a>
             {% else %}
             <a href="{% url 'leads:assign_agent' task.id %}" class="flex-grow sm:flex-grow-0 text-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200">
               Assign Employee
             </a>
             {% endif %}
-            <button class="flex-grow sm:flex-grow-0 px-6 py-3 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-medium rounded-lg transition-colors duration-200">
+            {% if employee.role == 'manager'%}
+            <form method='post' action="{% url 'task_delete' task.id%}">
+            <button type='submit' class="flex-grow sm:flex-grow-0 px-6 py-3 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-medium rounded-lg transition-colors duration-200">
               Delete
             </button>
+          </form>
+            {% endif %}
           </div>
         </div>
 
@@ -139,14 +169,14 @@
             <h3 class="text-lg font-semibold text-white mb-4">Related Resources</h3>
             <div class="space-y-3">
               {% if task.documents %}
-              {% for file in task.documents.all %}
-                <div class="flex items-center p-3 bg-gray-800 rounded-lg">
-                  <svg class="w-6 h-6 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                  <a href="{{ file.file.url }}" class="text-gray-300" document='{{ file.file_name }}'>{{file.file_name}}</a>
-                </div>
-              {% endfor %}
+                {% for file in task.documents.all %}
+                  <div class="flex items-center p-3 bg-gray-800 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <a href="{{ file.url }}" class="text-gray-300" document='{{ file.file_name }}'>{{file.file_name}}</a>
+                  </div>
+                {% endfor %}
               {% endif %}
               
             </div>

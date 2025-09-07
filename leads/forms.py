@@ -48,14 +48,31 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class AgentAssignForm(forms.Form):
-    agent = forms.ModelMultipleChoiceField(queryset=Employee.objects.all(), widget=forms.CheckboxSelectMultiple)
-    
+    assigned_to = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-select text-black px-4 py-2 rounded-md'}))
+    task = forms.ModelChoiceField(queryset=Task.objects.all())
+    create_group_chat = forms.BooleanField(required=False, initial=True)
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        task = kwargs.pop('task')
+        super().__init__(*args, **kwargs)
+        queryset = Employee.objects.filter(company=user.company)
+        self.fields['assigned_to'].queryset = queryset
+        self.fields['assigned_to'].widget.attrs.update({
+            # 'class': 'form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out',
+            'hx-post': reverse('leads:htmx_check'),
+            'hx-trigger': 'change',
+            'hx-target': '#group-chat-toggle',
+            'hx-include': 'closest form',
+        })
+        self.fields['task'].initial = task
+        self.fields['task'].disabled = True
 
 
 class CompanyModelForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ['name', 'logo']
+        fields = ['name', 'logo', 'email']
 
 class AssignTaskDependencyForm(forms.Form):
     from_task = forms.ModelChoiceField(queryset=Task.objects.none(),widget=forms.Select(attrs={'class': 'form-select bg-slate-700 text-white px-4 py-2 rounded-md'}), label='from task')

@@ -1,4 +1,4 @@
-<span id="online-count" hx-swap-oob="outerHTML" class="pr-1">{{ online_count }}</span>
+ <span id="online-count" hx-swap-oob="outerHTML" class="pr-1">{{ online_count }}</span>
 
 {% if online_count %}
 <div class='green-dot absolute top-2 left-2' id='online_icon'></div>
@@ -6,7 +6,7 @@
 <div class='gray-dot absolute top-2 left-2' id='online_icon'></div>
 {% endif %}
 
-<ul class='flex gap-4' id='groupchat-members'>
+{% comment %} <ul class='flex gap-4' id='groupchat-members'>
     {% for member in chat_group.members.all %}
         <li>
             <a href={% url "employees:employee_detail" member.id %} class='flex flex-col text-gray-400 items-center justify-center w-20 gap-2'>
@@ -18,8 +18,8 @@
                     {% endif %}
                 </div>
 
-                {{ member.first_name}}
+                {{ member.user.username}}
             </a>
         </li>
     {% endfor %}
-</ul>
+</ul> {% endcomment %}

@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from .forms import CreateWorkflowForm, TemplateTaskForm, TemplateDependencyForm
-from .models import WorkFlowTemplate, TemplateTask, TemplateDependency
+from .models import WorkFlowTemplate, TemplateTask, TemplateDependency, WorkflowInstance
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from .utils import generate_workflow
+from django.utils.timezone import now
 from django.template.loader import render_to_string
 # Create your views here.
 @login_required
 def workflow_list(request):
-    workflows = WorkFlowTemplate.objects.filter(company=request.user.employee.company)
-
+    workflow_templates = WorkFlowTemplate.objects.filter(company=request.user.employee.company)
+    instances = WorkflowInstance.objects.filter(company=request.user.employee.company)
+    
     if request.method == 'POST':
         form = CreateWorkflowForm(request.POST, user=request.user)
         if form.is_valid():
@@ -19,8 +21,7 @@ def workflow_list(request):
             return redirect('workflow:workflow_list')
     else:
         form = CreateWorkflowForm(user=request.user)
-    
-    return render(request, 'automation/workflow_list.html', {'workflows':workflows, 'form':form})
+    return render(request, 'automation/workflow_list.html', {'workflows':workflow_templates, 'form':form, 'workflow_instances':instances})
 
 def create_template_task(request, workflow_id):
     workflow = get_object_or_404(WorkFlowTemplate, id=workflow_id)
@@ -64,8 +65,8 @@ def deploy_workflow(request, workflow_id):
     if workflow.company != request.user.employee.company:
         return redirect('workflow:workflow_list')
     generate_workflow(workflow, workflow.company, request.user.employee)
-    workflow.is_active = True
-    workflow.save()
+    workflow.is_published = True
+    workflow.last_deployed = now()
     return redirect('workflow:workflow_list')
 
 def workflow_detail(request, workflow_id):

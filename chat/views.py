@@ -47,7 +47,7 @@ def chat_home(request, group_name):
             return render(request, 'chat/partials/chat_message_p.html', context)
         
     form = ChatMessageForm()
-    return render(request, 'chat/chat.html', {"messages":messages, 'form':form, 'group_name':group_name, 'other_user':other_user, 'chat_group':chat_group})
+    return render(request, 'chat/chat.html', {"messages":messages, 'form':form, 'group_name':group_name, 'other_user':other_user, 'chat_group':chat_group, 'user':request.user})
 
 def get_or_create_chatroom(request, username):
     User = get_user_model()
@@ -74,7 +74,7 @@ def create_group_chat(request):
             new_group = form.save(commit=False)
             new_group.admin = request.user
             new_group.save()
-            new_group.members.add(request.user)
+            new_group.members.add(request.user)          
             return redirect('chat:chat', new_group.groupchat_name)
     form =  ChatGroupForm()
     return render(request, 'chat/group_chat.hml', {'form':form})
@@ -119,5 +119,5 @@ def chat_file_upload(request, group_name):
         message = ChatMessage.objects.create(author=request.user, file=file, group=chat_group)
         channel_layer = get_channel_layer()
         event = {'type':'message_handler', 'message_id':message.id}
-        async_to_sync(channel_layer.group_send)(chat_group, event)
+        async_to_sync(channel_layer.group_send)(chat_group.group_name, event)
         return HttpResponse()

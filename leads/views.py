@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.utils import timezone
-from .models import Task, Category, Employee, TaskDependency
+from .models import Task, Employee, TaskDependency
 from django.core.mail import send_mail
 from .forms import TaskModelForm, TaskDocumentForm, AssignTaskDependencyForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -24,10 +24,7 @@ class TaskListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         employee = Employee.objects.get(user=user)
-        if employee.role == 'manager':
-            queryset = Task.objects.filter(company = employee.company)
-        else:
-            queryset = Task.objects.filter(assigned_to=employee, company=employee.company)
+        queryset = Task.objects.filter(assigned_to__in=[employee], company=employee.company)
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -38,6 +35,13 @@ class TaskListView(LoginRequiredMixin, ListView):
         if employee.role == 'manager':
             queryset = Task.objects.filter(assigned_to__isnull = True)
             context.update({'unassigned': queryset})
+            queryset2 = Task.objects.filter(status='suspended')
+            context.update({'suspended': queryset2})
+            queryset3 = Task.objects.filter(assigned_to__isnull = False).exclude(status ='suspended').distinct()
+            context.update({'active':queryset3.count()})
+            queryset4 = Task.objects.filter(status='completed')
+            queryset5 = Task.objects.filter(status='pending_approval')
+            context.update({'active_tasks':queryset3, 'completed_tasks':queryset4, 'tasks_pending_approval':queryset5})
         return context
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
@@ -144,9 +148,6 @@ class SignupView(generic.CreateView):
         return reverse('create_company')
 
     def form_valid(self, form):
-        # user = form.save()
-        # login(self.request, user)
-        # return super().form_valid(form)
         response = super().form_valid(form)
         login(self.request, self.object)
         return response
@@ -173,27 +174,7 @@ class CompanyCreationView(LoginRequiredMixin, CreateView):
         company.save()
         Employee.objects.create(role='manager', company=company, user = self.request.user)
         return redirect(self.get_success_url())
-    
-
-    
-# class AgentAssignView(CustomLoginRequiredMixin, generic.FormView):
-#     form_class = AgentAssignForm
-#     template_name = 'leads/assign_agent.html'
-
-#     def get_success_url(self):
-#         return reverse('leads:task_list')
-    
-#     # def get_form_kwargs(self):
-#     #     return {'request': self.request}
-
-#     def form_valid(self, form):
-#         employee = form.cleaned_data['agent']
-#         task = Task.objects.get(id=self.kwargs['pk'])
-#         task.employee = employee
-#         task.save()
-#         return super().form_valid(form)
-    
-    
+        
 def task_per_employee(request):
     today = now()
     start_of_week = today - timedelta(days=today.weekday())  
@@ -207,8 +188,8 @@ def task_per_employee(request):
             record[employee.user.username] = employee.completed_task
         return JsonResponse(record)
 
-def task_approval(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
+def task_approval(request, id):
+    task = get_object_or_404(Task, id=id)
     task_name = task.title
     employee = Employee.objects.get(user=request.user)
     if task.requires_approval and employee.role != 'manager':
@@ -368,3 +349,23 @@ class DependencyEditView(CustomLoginRequiredMixin, generic.View):
             'form': form,
             'user': request.user
         })
+
+class AgentAssignView(CustomLoginRequiredMixin, generic.View):
+    def get(self, request, id):
+        task = Task.objects.get(id=id)
+        form = AgentAssignForm(user=request.user, task=task)
+        return render(request, 'leads/assign_agent.html', {'form':form})
+    
+    def post(self, request, id):
+        task = Task.objects.get(id=id)
+        form = AgentAssignForm(request.POST, user=request.user, task=task)
+
+        if form.is_valid():
+            agents = form.cleaned_data['assigned_to']
+            task.create_group_chat = form.cleaned_data['create_group_chat']
+            task.save()
+            task.assigned_to.set(agents)
+            return redirect('leads:task_list')
+        
+        return render(request, 'leads/assign_agent.html', {'form':form})
+    
