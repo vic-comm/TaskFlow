@@ -10,3 +10,20 @@ urlpatterns = [
      path('employee_update/<int:pk>/', views.EmployeeUpdateView.as_view(), name='employee_update'),
      path('employee_delete/<int:pk>/', views.EmployeeDeleteView.as_view(), name='employee_delete'),
 ]
+
+# if DEBUG:
+    # CHANNEL_LAYERS = {
+    #     'default': {
+    #         'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    #     }
+    # }
+# else:
+
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:

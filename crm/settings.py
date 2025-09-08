@@ -118,21 +118,18 @@ TEMPLATES = [
 ASGI_APPLICATION = 'crm.asgi.application'
 REDIS_URL=env('REDIS_URL')
 
-if DEBUG:
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer'
-        }
-    }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [REDIS_URL]
-            },
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [{
+                    "address": env("REDIS_URL"),
+                    "ssl_cert_reqs": None,
+                }],
         },
-    }
+    },
+}
 
 CACHES = {
     "default": {
@@ -140,7 +137,7 @@ CACHES = {
         "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "SSL": True,
+            "CONNECTION_POOL_KWARGS": {"ssl_cert_reqs": None},
         }
     }
 }
@@ -148,14 +145,7 @@ CACHES = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# if DEBUG:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-# else:
+
 DATABASES = {'default': dj_database_url.parse(env('DATABASE_URL'), conn_max_age=600, ssl_require=True)}
 
 STORAGES = {

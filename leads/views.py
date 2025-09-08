@@ -12,6 +12,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.contrib.auth import login
 from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
 from datetime import timedelta
 from django.db.models import Q, Count, Avg
 from django.contrib import messages
@@ -86,7 +87,7 @@ class TaskCreateView(CustomLoginRequiredMixin, generic.View):
             return redirect(reverse('leads:task_list'))
         return render(request, self.template_name, {"task_form":task_form, 'document_form':document_form})
         
-
+@login_required
 def htmx_check_create_group_chat(request):
     assigned_ids = request.POST.getlist('assigned_to')
     if len(assigned_ids) >= 2:
@@ -115,7 +116,8 @@ class TaskDeleteView(CustomLoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse("leads:task_list")
-    
+
+
 def task_create(request):
     if request.method == 'POST':
         form = TaskModelForm(request.POST)
