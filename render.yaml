@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: crm-website
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate --noinput
+    startCommand: daphne -b 0.0.0.0 -p 8000 crm.asgi:application
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://postgres.gvxdcydmormroowpntbc:password@aws-1-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require
+      - key: REDIS_URL
+        value: redis://default:aXjpXeNgLXRkOZMPYYBD0y1ugACqB0oa@redis-18436.c81.us-east-1-2.ec2.redns.redis-cloud.com:18436/0
+      - key: SECRET_KEY
+        value: django-insecure-mbop02@x8nu3uk9v84wqcfqn(h#!cn+0hz^ovqkxb)x$+&z_t8
