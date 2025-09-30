@@ -1,0 +1,7 @@
+{
+  "name": "crm-website",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'Node.js available'"
+  }
+}

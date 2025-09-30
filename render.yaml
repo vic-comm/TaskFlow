@@ -14,3 +14,5 @@ services:
         value: redis://default:aXjpXeNgLXRkOZMPYYBD0y1ugACqB0oa@redis-18436.c81.us-east-1-2.ec2.redns.redis-cloud.com:18436/0
       - key: SECRET_KEY
         value: django-insecure-mbop02@x8nu3uk9v84wqcfqn(h#!cn+0hz^ovqkxb)x$+&z_t8
+      - key: NPM_BIN_PATH
+        value: /usr/bin/npm
