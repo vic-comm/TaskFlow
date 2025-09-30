@@ -7,8 +7,9 @@ from channels.layers import get_channel_layer
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
-
+from employees.decorators import manager_required
 # Create your views here.
+
 def chat_home(request, group_name):
     chat_group = get_object_or_404(ChatGroup, group_name=group_name)
     messages = chat_group.chat_message.all()
@@ -67,6 +68,7 @@ def get_or_create_chatroom(request, username):
 
     return redirect('chat:chat', chatroom.group_name)
 
+@manager_required
 def create_group_chat(request):
     if request.method == 'POST':
         form = ChatGroupForm(request.POST)
@@ -79,6 +81,7 @@ def create_group_chat(request):
     form =  ChatGroupForm()
     return render(request, 'chat/group_chat.hml', {'form':form})
 
+@manager_required
 def edit_chat(request, group_name):
     chat_group = ChatGroup.objects.get(group_name=group_name)
     if request.user != chat_group.admin:
@@ -98,6 +101,7 @@ def edit_chat(request, group_name):
     context = {'form':form, 'chat_group':chat_group}
     return render(request, 'chat/edit_chatroom.html', context)
 
+@manager_required
 def delete_chatroom(request, chatroom_name):
     chat_group = ChatGroup.objects.get(group_name=chatroom_name)
 

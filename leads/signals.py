@@ -186,7 +186,7 @@ def handle_delete(sender, instance, **kwargs):
             pass
 
     
-    if hasattr(instance, 'workflow_instance'):
+    if instance.workflow_instance:
         workflow = instance.workflow_instance
         all_completed = not workflow.tasks.exclude(status='completed').exists()
         

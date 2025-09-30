@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .mixins import CustomLoginRequiredMixin
 from leads.models import Employee
+from .decorators import manager_required
 # Create your views here.
 
 class EmployeeListView(CustomLoginRequiredMixin, generic.ListView):
@@ -15,6 +16,7 @@ class EmployeeListView(CustomLoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         employee = Employee.objects.get(user=self.request.user)
         return Employee.objects.filter(company=employee.company)
+    
 class EmployeeCreateView(CustomLoginRequiredMixin, generic.CreateView):
     template_name = 'employees/create.html'
     form_class = EmployeeCreationForm

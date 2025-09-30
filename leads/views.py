@@ -112,35 +112,35 @@ class TaskDeleteView(CustomLoginRequiredMixin, DeleteView):
     
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(profile=user.userprofile)
+        return Task.objects.filter(company=user.employee.company)
 
     def get_success_url(self):
         return reverse("leads:task_list")
 
 
-def task_create(request):
-    if request.method == 'POST':
-        form = TaskModelForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("leads:task_list")
-    form = TaskModelForm()
-    return render(request, 'leads/create.html', {'form':form})
+# def task_create(request):
+#     if request.method == 'POST':
+#         form = TaskModelForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect("leads:task_list")
+#     form = TaskModelForm()
+#     return render(request, 'leads/create.html', {'form':form})
 
-def task_update(request, pk):
-    task = Task.objects.get(id=pk)
-    form = TaskModelForm(instance=task)
-    if request.method == 'POST':
-        form = TaskModelForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect("leads:task_list")
-    return render(request, 'leads/update.html', {'task': task, 'form':form})
+# def task_update(request, pk):
+#     task = Task.objects.get(id=pk)
+#     form = TaskModelForm(instance=task)
+#     if request.method == 'POST':
+#         form = TaskModelForm(request.POST, instance=task)
+#         if form.is_valid():
+#             form.save()
+#             return redirect("leads:task_list")
+#     return render(request, 'leads/update.html', {'task': task, 'form':form})
 
-def task_delete(request, pk):
-    task = Task.objects.get(id=pk)
-    task.delete()
-    redirect("leads:task_list")
+# def task_delete(request, pk):
+#     task = Task.objects.get(id=pk)
+#     task.delete()
+#     redirect("leads:task_list")
 
 class SignupView(generic.CreateView):
     template_name = 'registration/signup.html'

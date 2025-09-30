@@ -6,6 +6,7 @@ from django.forms import formset_factory
 from .utils import generate_workflow
 from django.utils.timezone import now
 from django.template.loader import render_to_string
+from employees.decorators import manager_required
 # Create your views here.
 @login_required
 def workflow_list(request):
@@ -23,6 +24,7 @@ def workflow_list(request):
         form = CreateWorkflowForm(user=request.user)
     return render(request, 'automation/workflow_list.html', {'workflows':workflow_templates, 'form':form, 'workflow_instances':instances})
 
+@manager_required
 def create_template_task(request, workflow_id):
     workflow = get_object_or_404(WorkFlowTemplate, id=workflow_id)
     if request.method == 'POST':
@@ -45,7 +47,7 @@ def create_template_task(request, workflow_id):
         template_form = TemplateTaskForm(template=workflow)
     return render(request, 'automation/workflow_detail.html', {'template_form':template_form})
 
-
+@manager_required
 def assign_template_dependency(request, workflow_id):
     workflow_template = get_object_or_404(WorkFlowTemplate, id=workflow_id)
     if request.method == 'POST':
@@ -60,6 +62,7 @@ def assign_template_dependency(request, workflow_id):
         dependency_form  = TemplateDependencyForm(workflow_template=workflow_template)
     return render(request, 'automation/workflow_detail.html', {'dependency_form':dependency_form})
 
+@manager_required
 def deploy_workflow(request, workflow_id):
     workflow = get_object_or_404(WorkFlowTemplate, id=workflow_id)
     if workflow.company != request.user.employee.company:
@@ -86,12 +89,14 @@ def htmx_check_create_group_chat(request):
         html = ''  # Return empty so the checkbox disappears
     return HttpResponse(html)
 
+@manager_required
 def delete_template(request, workflow_id, task_id):
     if request.POST:
         template = TemplateTask.objects.get(id=task_id)
         template.delete()
     return redirect('workflow:workflow_detail', workflow_id)
 
+@manager_required
 def delete_workflow(request, workflow_id):
     if request.method == 'POST':
         workflow = get_object_or_404(WorkFlowTemplate, id=workflow_id)

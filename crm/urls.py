@@ -38,11 +38,11 @@ urlpatterns = [
     path('chat_room/', include('chat.urls', namespace='chat')),
 ]
 
-if settings.DEBUG:
-    # Include django_browser_reload URLs only in DEBUG mode
-    urlpatterns += [
-        path("__reload__/", include("django_browser_reload.urls")),
-    ]
+# if settings.DEBUG:
+#     # Include django_browser_reload URLs only in DEBUG mode
+#     urlpatterns += [
+#         path("__reload__/", include("django_browser_reload.urls")),
+#     ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -53,3 +53,17 @@ if settings.DEBUG:
 #   //   "build:tailwind": "cross-env NODE_ENV=production postcss ./src/styles.css -o ../static/css/dist/styles.css --minify",
 #   //   "dev": "cross-env NODE_ENV=development postcss ./src/styles.css -o ../static/css/dist/styles.css --watch"
 #   // },
+
+
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [{
+#                     "address": env("REDIS_URL"),
+#                     "ssl_cert_reqs": None,
+#                 }],
+#         },
+#     },
+# }

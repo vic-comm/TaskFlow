@@ -49,6 +49,7 @@ ALLOWED_HOSTS = ['crm-website-ccg7.onrender.com', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'daphne',
+    'channels',
     "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -67,16 +68,13 @@ INSTALLED_APPS = [
     'automation.apps.AutomationConfig',
     'django_cleanup.apps.CleanupConfig',
     'django_htmx',
-    'channels',
     'tailwind',
     'theme',
 ]
 TAILWIND_APP_NAME='theme'
 NPM_BIN_PATH= r"C:\Program Files\nodejs\npm.cmd"
 
-if DEBUG:
-    # Add django_browser_reload only in DEBUG mode
-    INSTALLED_APPS += ['django_browser_reload']
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -91,11 +89,6 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
-if DEBUG:
-    # Add django_browser_reload middleware only in DEBUG mode
-    MIDDLEWARE += [
-        "django_browser_reload.middleware.BrowserReloadMiddleware",
-    ]
 ROOT_URLCONF = "crm.urls"
 
 TEMPLATES = [
@@ -118,18 +111,31 @@ TEMPLATES = [
 ASGI_APPLICATION = 'crm.asgi.application'
 REDIS_URL=env('REDIS_URL')
 
+# CHANNEL_LAYERS = {
+#         'default': {
+#             'BACKEND': 'channels.layers.InMemoryChannelLayer'
+#         }
+#     }
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [{
-                    "address": env("REDIS_URL"),
-                    "ssl_cert_reqs": None,
-                }],
+            "hosts": [env('REDIS_URL')],
         },
     },
 }
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [{
+#                 "address": REDIS_URL,
+#                 "ssl_cert_reqs": None,  # disable cert 
+#             }],
+#         },
+#     },
+# }
 
 CACHES = {
     "default": {
@@ -137,10 +143,10 @@ CACHES = {
         "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS": {"ssl_cert_reqs": None},
         }
     }
 }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -213,11 +219,32 @@ STATIC_ROOT = BASE_DIR / 'static_root'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'leads.User'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_PORT=587
+    EMAIL_USE_TLS=True
+    DEFAULT_FROM_EMAIL='TASKFLOW'
+    ACCOUNT_EMAIL_SUBJECT_PREFIX=''
 LOGIN_REDIRECT_URL = 'leads/'
 LOGIN_URL = 'login'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "ERROR",
+    },
+}
